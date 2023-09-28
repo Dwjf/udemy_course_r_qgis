@@ -1,0 +1,72 @@
+---
+title: "data"
+author: "Daniel"
+date: "2023-09-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+require(sf)
+require(tidyverse)
+
+sort_candidate<-st_read("C:\\projects\\udemy_course_r_qgis\\sort_candidates.shp") %>% 
+  mutate(id=1:4) %>% 
+  select(id)
+
+st_write(sort_candidate,"data/sort_candidate.shp",append=FALSE)
+
+hubs<-st_read("C:\\projects\\udemy_course_r_qgis\\hubs.shp") %>% 
+  mutate(volume=0.5*population) %>% 
+  rename(hub_name=NAMA_DM) %>% 
+  select(hub_name,volume)
+
+st_write(hubs,"data/hubs.shp",append=FALSE)
+  
+  
+
+
+```
+
+
+```{r}
+# Required libraries for data manipulation
+library(readr)
+library(dplyr)
+library(tidyr)
+
+# List of file paths
+files <- c('data/hub_distance_0.csv', 'data/hub_distance_1.csv', 'data/hub_distance_2.csv', 'data/hub_distance_3.csv')
+
+# Function to calculate weighted average distance for each sortation center
+calculate_weighted_avg_distance <- function(file) {
+  # Reading the data
+  data <- read_csv(file)
+  
+  # Calculating the weighted average distance
+  weighted_avg_distance <- data %>%
+    group_by(HubName) %>%
+    summarise(weighted_avg = sum(volume * HubDist) / sum(volume))
+  
+  return(weighted_avg_distance)
+}
+
+# Calculating the weighted average distance for each file and combining the results
+result <- lapply(files, calculate_weighted_avg_distance) %>%
+  bind_rows(.id = "file_id")
+
+# Display the result
+print(result)
+
+```
+
+
+```{r}
+
+```
+
+
